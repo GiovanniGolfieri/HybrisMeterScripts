@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs -I {} basename {})",
+      "Bash(python3 -c ' *)",
+      "Bash(/dati/Lavoro/=HYBRIS=/HybrisMeter/BE/api/venv/bin/pip --version)",
+      "Bash(python3 -m venv /dati/Lavoro/=HYBRIS=/HybrisMeter/BE/api/venv)",
+      "Bash(/dati/Lavoro/=HYBRIS=/HybrisMeter/BE/api/venv/bin/pip install *)"
+    ]
+  }
+}

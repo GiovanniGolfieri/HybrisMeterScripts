@@ -1,0 +1,44 @@
+#!/bin/bash
+# --------------------------------------------------------------------------------------------------------------------
+# Platform version: every commit in DB / BE / FE / INSTALLERAPP / USERAPP carries the next version in its VERSION file.
+#   - VERSION unchanged since HEAD  -> automatic: MAJOR.MINOR of the highest version, BUILD = highest BUILD + 1
+#   - VERSION edited by hand (or by ./version.sh set) -> kept as it is, after checking that BUILD does not go back
+# Installed with: git config core.hooksPath <HybrisMeter>/.githooks   (done by ./version.sh install)
+# --------------------------------------------------------------------------------------------------------------------
+source "$(dirname "$(readlink -f "$0")")/version-lib.sh"
+
+top="$(git rev-parse --show-toplevel)"
+repo="$(basename "$top")"
+file="$top/VERSION"
+[ -f "$file" ] || exit 0                       # repository not (yet) versioned
+
+head_v="$(git show HEAD:VERSION 2>/dev/null | tr -d '[:space:]')"
+work_v="$(hm_read_file "$file")"
+raw_v="$(tr -d '[:space:]' < "$file")"
+
+if [ -n "$raw_v" ] && [ "$raw_v" != "$head_v" ]; then
+  # manual value
+  if [ -z "$work_v" ]; then
+    echo "pre-commit: VERSION '$raw_v' non valida (formato atteso MAGGIORE.MINORE.COMPILAZIONE)" >&2
+    exit 1
+  fi
+  read -r _ _ maxb <<< "$(hm_max "$repo")"
+  read -r _ _ b <<< "$(hm_split "$work_v")"
+  head_b=0
+  [[ "$head_v" =~ $HM_VERSION_RE ]] && read -r _ _ head_b <<< "$(hm_split "$head_v")"
+  if (( b < maxb || b <= head_b )); then
+    echo "pre-commit: VERSION $work_v ha una compilazione ($b) che torna indietro" \
+         "(massima negli altri repository: $maxb, ultima di $repo: $head_b)." >&2
+    echo "            Usa ./version.sh set MAGGIORE.MINORE per lasciare la compilazione automatica." >&2
+    exit 1
+  fi
+  new="$work_v"
+else
+  read -r maj min maxb <<< "$(hm_max "")"
+  new="$maj.$min.$((maxb + 1))"
+fi
+
+echo "$new" > "$file"
+git add "$file"
+echo "versione $repo: $new"
+exit 0

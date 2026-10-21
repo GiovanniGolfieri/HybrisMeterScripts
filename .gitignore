@@ -1,0 +1,12 @@
+# Components with their own repository (cloned inside this folder, see README.md)
+/DB/
+/BE/
+/FE/
+/INSTALLERAPP/
+/USERAPP/
+
+# Local scratch and per-user settings
+/TMP/
+/static/
+/.claude/settings.local.json
+/.claude/scheduled_tasks.lock
