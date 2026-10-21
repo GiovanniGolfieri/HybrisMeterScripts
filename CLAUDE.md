@@ -424,6 +424,12 @@ Importazione stabili (HANDLE_ROOT); la finestra «Importa» lascia scegliere qua
 Dal 2026-10-07: contatti **uno per riga** sotto la persona (resta valido più contatti in una cella), PEC riconosciute dal
 dominio (`pecDomains` nella stessa configurazione) o da «PEC:» e salvate come PEC; prima di scrivere l'import cerca
 presunti errori dei dati e, se ne trova, non scrive nulla e chiede conferma («Importa comunque»).
+Dal 2026-10-21 i modelli generici della colonna TIPO (-1/-2/-3, necessari alle formule dei fogli) si abbinano all'import
+al modello vero, una scelta per generico; per gli stabili già importati «Modelli misuratori» nella scheda stabile, per
+tutto il gruppo o per i soli misuratori spuntati (stabili con modelli misti). Un misuratore che trasmette con un codice
+diverso da quello del suo modello (es. modulo radio) si associa da solo alla prima trasmissione e prende il modello giusto.
+La colonna P «coeff» (KQ × KC del radiatore) diventa il K del misuratore; il fattore di rivalutazione del ripartitore
+(2.33 / 1.00) è del modello e i fogli lo dichiarano in Struttura G19:I19 (vedi [BE/api/CLAUDE.md](BE/api/CLAUDE.md)).
 
 **Riparto calore secondo il documento di riferimento** (2026-10-10): regole in `Specifiche e Doc normativi/info_CalcoloRiparti2/`
 (PDF = guida e formule, `Riparto_calore_tecnico.md` = specifica). Energia di centrale proposta dai misuratori generali (RISC =
@@ -460,6 +466,12 @@ cambia ogni giorno), verifica completa il giorno 1 alle 03:30. Parametri in `loo
 Configurazione → Sistema → Calcolo consumi (HANDLE_ROOT), applicati senza riavvio. Pulsante «Aggiorna ora» nella pagina
 Consumi = elaborazione sincrona dello stabile. Il riparto ACS elabora la coda dello stabile prima di leggere i consumi.
 DB: `39.consQueue.sql`, `55.trConsumptions.sql` — vedi [DB/CLAUDE.md](DB/CLAUDE.md).
+Dal 2026-10-21 i ripartitori nei grafici valgono **gli stessi kWh del riparto**: u.r. corrette come nel riparto (K × fattore
+di base) × fattore del riparto approvato che copre il mese, altrimenti dello stabile, altrimenti **stima del modello di
+ripartitore** (`db_meterTypes.typ_urKwhFactor`, consumi segnalati come stimati su web e app). Allarme 2 chiuso da solo
+quando un fattore c'è; nella scheda dello stabile confronto dei consumi della stagione con il fabbisogno di progetto.
+L'ACS mensile di un'unità = m³ di acqua calda × 1.162 × (calda − fredda), gli stessi kWh del volontario del riparto ACS:
+c'è dal primo giorno, senza generali, totali o bollette.
 
 **Guida** (2026-08-28): pagine descrittive della piattaforma (es. come vengono eseguiti i
 riparti acqua/calore). Contenuto = file Markdown in `BE/api/content/guida/` (**non su DB**, per
